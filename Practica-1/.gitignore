@@ -1,0 +1,22 @@
+# --- Binarios y Ejecutables ---
+*.out
+*.exe
+
+# --- Objetos y Librerías ---
+*.o
+*.obj
+*.a
+*.so
+
+# --- Datos y Datasets ---
+*.csv
+*.tsv
+*.bin
+*.dat
+*.idx
+
+# --- Documentación y Sistema ---
+# Archivos ocultos de sistema o editores
+.DS_Store
+.vscode/
+.idea/
