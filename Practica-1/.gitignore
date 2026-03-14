@@ -1,6 +1,7 @@
 # --- Binarios y Ejecutables ---
 *.out
 *.exe
+/bin
 
 # --- Objetos y Librerías ---
 *.o
