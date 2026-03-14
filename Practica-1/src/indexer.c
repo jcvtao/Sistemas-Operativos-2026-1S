@@ -45,13 +45,15 @@ char* get_field(char **line) {
 }
 
 int main() {
-    FILE *csv = fopen("../data/companies_sorted.csv", "r");
-    FILE *data_bin = fopen("../bin/data.bin", "wb+");
+    FILE *csv = fopen("data/companies_sorted.csv", "r");
+    FILE *data_bin = fopen("bin/data.bin", "wb+");
     
     if (!csv || !data_bin) {
         printf("Error abriendo archivos.\n");
         return 1;
     }
+
+    printf("Indexando...\n");
 
     // Inicializar Tabla Hash en RAM (8MB aprox)
     // Guardamos el offset del primer elemento en data.bin para cada hash
@@ -101,7 +103,7 @@ int main() {
     }
 
     // Guardar la tabla hash en un archivo para que el buscador la use
-    FILE *idx_bin = fopen("../bin/index.bin", "wb");
+    FILE *idx_bin = fopen(" bin/index.bin", "wb");
     fwrite(hash_table, sizeof(long), HASH_SIZE, idx_bin);
     
     fclose(csv);

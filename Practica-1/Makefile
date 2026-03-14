@@ -1,14 +1,14 @@
 # Makefile para la Práctica 1
-CC=gcc
-CFLAGS=-Iinclude
-
-all: indexer searcher
+all: indexer searcher menu
 
 indexer: src/indexer.c
-	$(CC) src/indexer.c -o bin/indexer
+	gcc src/indexer.c -o bin/indexer
 
 searcher: src/searcher.c
-	$(CC) src/searcher.c -o bin/searcher
+	gcc src/searcher.c -o bin/searcher
+
+menu: src/menu.c
+	gcc src/menu.c -o bin/menu
 
 clean:
-	rm -f bin/indexer bin/searcher bin/*.bin
+	rm -f bin/indexer bin/searcher bin/menu bin/*.bin
