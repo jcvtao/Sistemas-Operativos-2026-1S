@@ -11,4 +11,4 @@ menu: src/menu.c
 	gcc src/menu.c -o bin/menu
 
 clean:
-	rm -f bin/indexer bin/searcher bin/menu bin/*.bin
+	rm -f bin/indexer bin/searcher bin/menu bin/req_fifo bin/res_fifo bin/*.bin
