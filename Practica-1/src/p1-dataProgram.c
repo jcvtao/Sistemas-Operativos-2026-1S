@@ -76,8 +76,8 @@ int main() {
         int found = 0;
         while (read(fd_res, &res, sizeof(Company)) > 0) {
             if (res.name[0] == '\0') break; // Fin de resultados
-            printf("- Name: %s | Country: %s | Industry: %s | URL: %s\n", 
-                    res.name, res.country, res.industry, res.linkedin);
+            printf("- Name: %s | Country: %s | Industry: %s | Year: %s | Domain: %s\n", 
+                    res.name, res.country, res.industry, res.year, res.domain);
             found++;
         }
         close(fd_res);

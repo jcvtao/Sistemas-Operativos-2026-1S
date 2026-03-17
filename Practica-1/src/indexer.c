@@ -55,15 +55,15 @@ int main() {
         char *ptr = line;
         Company c;
         
-        get_field(&ptr); // ID
-        strncpy(c.name, get_field(&ptr) ? : "", MAX_STR);
-        strncpy(c.domain, get_field(&ptr) ? : "", MAX_STR);
-        strncpy(c.year, get_field(&ptr) ? : "", 10);
-        strncpy(c.industry, get_field(&ptr) ? : "", MAX_STR);
-        get_field(&ptr); // size range
-        strncpy(c.locality, get_field(&ptr) ? : "", MAX_STR);
-        strncpy(c.country, get_field(&ptr) ? : "", MAX_STR);
-        strncpy(c.linkedin, get_field(&ptr) ? : "", 120);
+        get_field(&ptr);                                        // skip: #
+        strncpy(c.name, get_field(&ptr) ? : "", MAX_STR);       // name
+        strncpy(c.domain, get_field(&ptr) ? : "", MAX_STR);     // domain
+        strncpy(c.year, get_field(&ptr) ? : "", 10);            // year
+        strncpy(c.industry, get_field(&ptr) ? : "", MAX_STR);   // industry
+        get_field(&ptr);                                        // skip: size range
+        get_field(&ptr);                                        // skip: locality
+        strncpy(c.country, get_field(&ptr) ? : "", MAX_STR);    // country
+        // skip: linkedin url, current employee estimate, total employee estimate
 
         // Hash Nombre
         unsigned long h_name = get_hash((unsigned char*)c.name);

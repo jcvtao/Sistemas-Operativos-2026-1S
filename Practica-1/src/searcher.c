@@ -4,30 +4,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include "../include/structures.h"
 
-// Definiciones idénticas al indexer y menu
-#define MAX_STR 90
-#define HASH_SIZE 500000 
 #define REQ_FIFO "bin/req_fifo"
 #define RES_FIFO "bin/res_fifo"
-
-typedef struct {
-    char name[MAX_STR];
-    char domain[MAX_STR];
-    char year[10];
-    char industry[MAX_STR];
-    char locality[MAX_STR];
-    char country[MAX_STR];
-    char linkedin[120];
-    long next_name;     
-    long next_criteria; 
-} Company;
-
-typedef struct {
-    int type; // 1: Nombre, 2: Pais+Industria, 3: Salir
-    char key1[MAX_STR]; 
-    char key2[MAX_STR]; 
-} SearchRequest;
 
 // Función Hash DJB2 (Debe ser idéntica en todos los archivos)
 unsigned long get_hash(unsigned char *str) {

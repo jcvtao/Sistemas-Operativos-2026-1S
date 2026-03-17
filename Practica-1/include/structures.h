@@ -1,7 +1,7 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-#define MAX_STR 90
+#define MAX_STR 60
 #define HASH_SIZE 500000 
 
 typedef struct {
@@ -9,9 +9,7 @@ typedef struct {
     char domain[MAX_STR];
     char year[10];
     char industry[MAX_STR];
-    char locality[MAX_STR];
     char country[MAX_STR];
-    char linkedin[120];
     long next_name;     // Puntero para colisiones de nombre
     long next_criteria; // Puntero para colisiones de pais+industria
 } Company;
