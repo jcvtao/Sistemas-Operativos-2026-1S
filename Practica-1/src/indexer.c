@@ -3,6 +3,9 @@
 #include <string.h>
 #include "../include/structures.h"
 
+/**
+ * @brief Función Hash DJB2
+ */
 unsigned long get_hash(unsigned char *str) {
     unsigned long hash = 5381;
     int c;
@@ -10,6 +13,9 @@ unsigned long get_hash(unsigned char *str) {
     return hash % HASH_SIZE;
 }
 
+/**
+ * @brief Función para leer campos del dataset
+ */
 char* get_field(char **line) {
     if (*line == NULL || **line == '\0') return NULL;
     char *start = *line;
@@ -27,13 +33,20 @@ char* get_field(char **line) {
 
 int main() {
     int r;
+    char *s;
 
     FILE *csv = fopen("data/companies_sorted.csv", "r");
     FILE *data_bin = fopen("bin/data.bin", "wb+");
 
-    if (!csv || !data_bin) { 
-        perror("Error en archivos"); 
-        return 1; }
+    if (!csv) { 
+        perror("Error localizando dataset"); 
+        exit(-1);
+    }
+
+    if (!data_bin) {
+        perror("Error localizando data.bin");
+        exit(-1);
+    }
 
     printf("Indexando...\n");
 
@@ -41,14 +54,19 @@ int main() {
     long *idx_country_industry = malloc(HASH_SIZE * sizeof(long));
 
     if (!idx_name || !idx_country_industry) {
-        perror("Error en malloc: ");
+        perror("Error en malloc");
         exit(-1);
     }
 
     for(int i=0; i<HASH_SIZE; i++) idx_name[i] = idx_country_industry[i] = -1;
 
     char line[2048];
-    fgets(line, sizeof(line), csv); // Cabecera
+    s = fgets(line, sizeof(line), csv);
+    
+    if (s == NULL) {
+        perror("Error leyendo dataset");
+        exit(-1);
+    }
 
     int count = 0;
     while (fgets(line, sizeof(line), csv)) {
@@ -79,7 +97,7 @@ int main() {
         long offset = ftell(data_bin);
         r = fwrite(&c, sizeof(Company), 1, data_bin);
         if (r != 1) { 
-            perror("Error fwrite"); 
+            perror("Error escribiendo data.bin"); 
             exit(-1); 
         }
 
@@ -100,13 +118,13 @@ int main() {
 
     r = fwrite(idx_name, sizeof(long), HASH_SIZE, f1);
     if (r != HASH_SIZE) { 
-        perror("Error fwrite idx_name"); 
+        perror("Error en index por nombre"); 
         exit(-1); 
     }
 
     fwrite(idx_country_industry, sizeof(long), HASH_SIZE, f2);
     if (r != HASH_SIZE) { 
-        perror("Error fwrite idx_country_industry"); 
+        perror("Error en index por país e industria"); 
         exit(-1); 
     }
 

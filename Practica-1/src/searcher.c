@@ -6,10 +6,13 @@
 #include <sys/stat.h>
 #include "../include/structures.h"
 
+// Dirección tuberías
 #define REQ_FIFO "bin/req_fifo"
 #define RES_FIFO "bin/res_fifo"
 
-// Función Hash DJB2 (Debe ser idéntica en todos los archivos)
+/**
+ * @brief Función Hash DJB2
+ */
 unsigned long get_hash(unsigned char *str) {
     unsigned long hash = 5381;
     int c;
@@ -19,7 +22,9 @@ unsigned long get_hash(unsigned char *str) {
 }
 
 int main() {
-    // 1. Reservar y cargar índices en RAM (Total 8MB)
+    int r;
+
+    // Reservar y cargar índices en RAM
     long *idx_name = malloc(HASH_SIZE * sizeof(long));
     long *idx_country_industry = malloc(HASH_SIZE * sizeof(long));
     
@@ -31,7 +36,7 @@ int main() {
     FILE *f_n = fopen("bin/index_name.bin", "rb");
     FILE *f_c = fopen("bin/index_country_industry.bin", "rb");
     if (!f_n || !f_c) {
-        perror("Error: No se encontraron los archivos de índice. Ejecuta el indexer primero");
+        perror("Error: ¡No se encontraron los archivos de índice! Ejecuta ./bin/indexer primero");
         exit(-1);
     }
 
@@ -39,20 +44,24 @@ int main() {
     fread(idx_country_industry, sizeof(long), HASH_SIZE, f_c);
     fclose(f_n); fclose(f_c);
 
-    // 2. Abrir el archivo de datos principal
+    // Abrir data.bin
     FILE *data_f = fopen("bin/data.bin", "rb");
     if (!data_f) {
         perror("Error al abrir data.bin");
         exit(-1);
     }
 
-    printf("[SEARCHER] Servicio activo y cargado en RAM (8MB). Esperando peticiones...\n");
+    printf("[SEARCHER] Servicio activo. Esperando peticiones...\n");
 
     SearchRequest req;
     while (1) {
-        // Abrir FIFO de peticiones (se bloquea hasta que el Menú envíe algo)
+        // Abrir FIFO de peticiones
         int fd_req = open(REQ_FIFO, O_RDONLY);
-        if (fd_req < 0) { perror("Error abriendo req_fifo"); sleep(1); continue; }
+        if (fd_req < 0) {
+            perror("[ERROR] Error abriendo req_fifo. Ejecuta ./bin/p1-dataProgram primero");
+            sleep(3);
+            continue;
+        }
 
         if (read(fd_req, &req, sizeof(SearchRequest)) > 0) {
             // Abrir FIFO de respuesta
@@ -69,22 +78,29 @@ int main() {
                 offset = idx_name[h];
 
                 while (offset != -1) {
-                    fseek(data_f, offset, SEEK_SET);
-                    Company c;
-                    fread(&c, sizeof(Company), 1, data_f);
+                    r = fseek(data_f, offset, SEEK_SET); // Buscar colisiones
+                    if (r != 0) {
+                        perror("Error buscando empresa(s)");
+                    }
 
-                    // Comparación exacta (ignorando el hash por colisiones)
+                    Company c;
+                    r = fread(&c, sizeof(Company), 1, data_f);
+                    if (r <= 0) {
+                        perror("Error leyendo empresa");
+                    }
+                    
+                    // Comparación de nombre (verificación)
                     if (strcasecmp(c.name, req.key1) == 0) {
                         write(fd_res, &c, sizeof(Company));
                         encontrados++;
                     }
-                    offset = c.next_name; // Seguir la cadena en el archivo
+                    offset = c.next_name;
                 }
             } 
             else if (req.type == 2) { // BÚSQUEDA POR PAÍS E INDUSTRIA
                 printf("[LOG] Buscando por Pais: '%s' e Industria: '%s'\n", req.key1, req.key2);
                 
-                // Re-crear la llave combinada como se hizo en el indexer
+                // Llave combinada
                 char combined[MAX_STR * 2];
                 snprintf(combined, sizeof(combined), "%s%s", req.key1, req.key2);
                 
@@ -92,11 +108,18 @@ int main() {
                 offset = idx_country_industry[h];
 
                 while (offset != -1) {
-                    fseek(data_f, offset, SEEK_SET);
-                    Company c;
-                    fread(&c, sizeof(Company), 1, data_f);
+                    r = fseek(data_f, offset, SEEK_SET);
+                    if (r != 0) {
+                        perror("Error buscando empresa(s)");
+                    }
 
-                    // Verificar ambos criterios para confirmar el match
+                    Company c;
+                    r = fread(&c, sizeof(Company), 1, data_f);
+                    if (r <= 0) {
+                        perror("Error leyendo empresa");
+                    }
+
+                    // Comparación de país e inudstria (verificación)
                     if (strcasecmp(c.country, req.key1) == 0 && strcasecmp(c.industry, req.key2) == 0) {
                         write(fd_res, &c, sizeof(Company));
                         encontrados++;
@@ -107,8 +130,7 @@ int main() {
 
             printf("[LOG] Búsqueda finalizada. %d resultados enviados.\n", encontrados);
 
-            // Enviar "sentinela" (estructura vacía) para avisar al Menú que terminamos
-            Company sentinel;
+            Company sentinel; // Empresa vacía para finalizar
             memset(&sentinel, 0, sizeof(Company));
             write(fd_res, &sentinel, sizeof(Company));
             
