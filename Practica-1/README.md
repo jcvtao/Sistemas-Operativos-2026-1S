@@ -73,7 +73,7 @@ make
 
 ### Ejecución Automática
 
-> [WARNING!]
+> [!WARNING]
 > ¡Se debe ejecutar al menos una vez para indexar el dataset y crear las tuberías!
 
 Este proceso ejecuta todo el programa en el orden necesario y abre dos terminales con los procesos: interfaz y buscador.
