@@ -9,7 +9,9 @@
 
 ## Enunciado
 
-[Práctica 1](https://capedrazab.github.io/material_cursos/20261/os/practica1.pdf)
+El enunciado de la práctica se encuentra en los siguientes enlaces:
+- [Práctica 1 (Repositorio de César Pedraza)](https://capedrazab.github.io/material_cursos/20261/os/practica1.pdf)
+- [Práctica 1 (Repositorio del equipo)](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/blob/main/Practica-1/practica1.pdf)
 
 
 ## Dataset
@@ -51,19 +53,22 @@ Se implementaron dos criterios de búsqueda separados para permitirle al usuario
 
 El dataset tiene 7,004,635 valores únicos para los nombres de las empresas, los cual permite al usuario encontrar fácilmente una empresa (o empresas que compartan el nombre) con conocer esta información, y añadir el país o la industria en la búsqueda no permite filtrar más allá; sin embargo, si un usuario desea conocer empresas que compartan el mismo sector económico y se ubiquen en el mismo país puede encontrar esta información con el segundo criterio de búsqueda, el cual ofrece usualmente más de un resultado (varias empresas) por búsqueda.
 
+Adicionalmente, se utilizaron solamente cinco campos del dataset en el procesamiento de la información para reducir el tamaño de `data.bin` y que la impresión de los resultados en consola mostrara la información más importante de las empresas. Los campos utilizados fueron: _name_, _domain_, _year_, _industry_ y _country_.
+
 ### Adaptaciones de Rendimiento
 
 - **Indexación Binaria:** El CSV se transforma en un archivo `data.bin` de registros fijos (90 bytes por campo). Esto permite usar `fseek()` para saltar directamente al registro sin leer el archivo secuencialmente.
 
-- **Gestión de Memoria:** Los índices en RAM ocupan exactamente **8MB** (4MB por tabla), cumpliendo con la restricción de **< 10MB** impuesta en la práctica.
-- **Comunicación (IPC):** Se utilizan dos tuberías nombradas (**FIFOs**) para la comunicación bidireccional entre el proceso de interfaz (`p1-dataProgram`) y elbBuscador (`searcher`).
+- **Gestión de Memoria:** Los índices en RAM ocupan exactamente 8MB (4MB por tabla), cumpliendo con la restricción de < 10MB impuesta en el enunciado de la práctica.
+
+- **Comunicación (IPC):** Se utilizan dos tuberías nombradas (FIFOs) para la comunicación bidireccional entre el proceso de interfaz (`menu`) y el buscador (`searcher`).
 
 
 ## Instrucciones de Uso
 
 ### Requisitos
 1. Tener instalado `gcc` y `make`.
-2. Descargar el dataset `companies.csv` y ubicarlo en `data/companies_sorted.csv`.
+2. Descargar el dataset [`companies_sorted.csv`](https://www.kaggle.com/datasets/peopledatalabssf/free-7-million-company-dataset?resource=download) y ubicarlo en `data/companies_sorted.csv`.
 
 ### Compilación
 En la raíz del proyecto, ejecute:
@@ -71,15 +76,18 @@ En la raíz del proyecto, ejecute:
 make
 ```
 
+> [!TIP]
+> Si desea eliminar correctamente los ejecutables para volver a compilar puede ejecutar el comando `make clean`.
+
 ### Ejecución Automática
 
-> [!WARNING]
-> ¡Se debe ejecutar al menos una vez para indexar el dataset y crear las tuberías!
-
-Este proceso ejecuta todo el programa en el orden necesario y abre dos terminales con los procesos: interfaz y buscador.
+Este proceso ejecuta todo el programa en el orden necesario: indexar, crear tuberías y abrir dos terminales con los procesos para la interfaz y para el buscador.
 ```bash
 ./p1-dataProgram
 ```
+
+> [!IMPORTANT]
+> ¡Se debe ejecutar al menos una vez para indexar el dataset y crear las tuberías!
 
 ### Ejecución Manual
 
@@ -89,7 +97,7 @@ Después de haber ejecutado al menos una vez `p1-dataProgram` se pueden ejecutar
 
 Este proceso abre la interfaz de usuario en la terminal.
 ```bash
-./bin/p1-dataProgram
+./bin/menu
 ```
 
 #### Buscador
@@ -103,7 +111,7 @@ Para realizar búsquedas siga las instrucciones en pantalla del menú.
 
 ### Rangos Válidos de Búsqueda
 
-- **Nombres, países e industrias:** Cadenas alfabéticas (a-z) en minúsculas. Los nombres de los países e industrias deben estar escritos en inglés.
+- **Nombres, países e industrias:** Cadenas alfabéticas (a-z) en minúsculas. Los nombres de los países e industrias deben estar escritos en inglés y se permiten signos de puntuación, acentos y espacios en medio (pero no al inicio).
 
 - **Opciones de menú:** Valores numéricos (1, 2 o 3 según corresponda).
 
