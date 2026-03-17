@@ -66,7 +66,11 @@ int main() {
         if (read(fd_req, &req, sizeof(SearchRequest)) > 0) {
             // Abrir FIFO de respuesta
             int fd_res = open(RES_FIFO, O_WRONLY);
-            if (fd_res < 0) { perror("Error abriendo res_fifo"); close(fd_req); continue; }
+            if (fd_res < 0) {
+                perror("Error abriendo res_fifo");
+                close(fd_req);
+                continue;
+            }
 
             unsigned long h;
             long offset;
