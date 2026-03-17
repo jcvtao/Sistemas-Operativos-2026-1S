@@ -10,7 +10,7 @@ indexer: src/indexer.c
 searcher: src/searcher.c
 	gcc src/searcher.c -o bin/searcher
 
-menu:
+menu: src/menu.c
 	gcc src/menu.c -o bin/menu	
 
 p1-dataProgram: src/p1-dataProgram.c
