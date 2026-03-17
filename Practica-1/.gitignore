@@ -2,6 +2,7 @@
 *.out
 *.exe
 /bin
+p1-dataProgram
 
 # --- Objetos y Librerías ---
 *.o
