@@ -63,11 +63,7 @@ El dataset tiene 7,004,635 valores únicos para los nombres de las empresas, los
 
 ### Requisitos
 1. Tener instalado `gcc` y `make`.
-2. Crear la carpeta de salida
-    ```bash
-    mkdir -p bin
-    ```
-3. Descargar el dataset `companies.csv` y ubicarlo en `data/companies.csv`.
+2. Descargar el dataset `companies.csv` y ubicarlo en `data/companies_sorted.csv`.
 
 ### Compilación
 En la raíz del proyecto, ejecute:
@@ -75,35 +71,34 @@ En la raíz del proyecto, ejecute:
 make
 ```
 
-### Ejecución
+### Ejecución Automática
 
-#### Indexación
+> [WARNING!]
+> ¡Se debe ejecutar al menos una vez para indexar el dataset y crear las tuberías!
 
-Este proceso lee el dataset y genera los índices binarios. Puede tardar unos minutos dependiendo del disco duro.
+Este proceso ejecuta todo el programa en el orden necesario y abre dos terminales con los procesos: interfaz y buscador.
 ```bash
-./bin/indexer
+./p1-dataProgram
 ```
 
-Solamente se debe ejecutar una vez y como resultado se obtendra una serie de archivos con extensión `.bin` en la carpeta `bin/`.
+### Ejecución Manual
 
-Poteriormente, para que la comunicación funcione, se deben abrir dos terminales en el siguiente orden.
+Después de haber ejecutado al menos una vez `p1-dataProgram` se pueden ejecutar los dos procesos de manera manual.
 
-#### Proceso 1: Interfaz
+#### Interfaz
 
 Este proceso abre la interfaz de usuario en la terminal.
 ```bash
 ./bin/p1-dataProgram
 ```
-Antes de realizar búsquedas se debe ejecutar el otro proceso.
 
-#### Proceso 2: Buscador
+#### Buscador
 
 Este proceso realiza las búsquedas solicitadas y hace un registro impreso en consola.
 ```bash
 ./bin/searcher
 ```
 Para realizar búsquedas siga las instrucciones en pantalla del menú.
-
 
 
 ### Rangos Válidos de Búsqueda
@@ -117,4 +112,8 @@ Para realizar búsquedas siga las instrucciones en pantalla del menú.
 
 - **Búsqueda por nombre:** Seleccionar opción `1`, ingresar `google`. El sistema retornará toda la información relacionada a Google presente en el dataset, que corresponde a 4 resultados.
 
+    ![Captura de búsqueda por nombre](img/busqueda_nombre.png)
+
 - **Búsqueda por país e industria:** Seleccionar opción `2`, escribir para el país `india` y para la industria `retail`. Retornará todas las empresas que coincidan con ambos filtros simultáneamente, obteniéndose la información de 1491 empresas.
+
+    ![Captura de búsqueda por país e industria](img/busqueda_pais_industria.png)
