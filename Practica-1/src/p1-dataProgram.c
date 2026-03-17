@@ -19,8 +19,19 @@ int is_all_alpha(char *str) {
 }
 
 int main() {
-    mkfifo(REQ_FIFO, 0666);
-    mkfifo(RES_FIFO, 0666);
+    int r;
+
+    r = mkfifo(REQ_FIFO, 0666);
+    if (r < 0) { 
+        perror("Error mkfifo REQ_FIFO"); 
+        exit(-1); 
+    }
+
+    r = mkfifo(RES_FIFO, 0666);
+    if (r < 0) { 
+        perror("Error mkfifo RES_FIFO"); 
+        exit(-1); 
+    }
 
     while (1) {
         printf("\n====== COMPANY SEARCH ======\n");
@@ -66,7 +77,7 @@ int main() {
         while (read(fd_res, &res, sizeof(Company)) > 0) {
             if (res.name[0] == '\0') break; // Fin de resultados
             printf("- Name: %s | Country: %s | Industry: %s | URL: %s\n", 
-                   res.name, res.country, res.industry, res.linkedin);
+                    res.name, res.country, res.industry, res.linkedin);
             found++;
         }
         close(fd_res);

@@ -26,14 +26,25 @@ char* get_field(char **line) {
 }
 
 int main() {
+    int r;
+
     FILE *csv = fopen("data/companies_sorted.csv", "r");
     FILE *data_bin = fopen("bin/data.bin", "wb+");
-    if (!csv || !data_bin) { perror("Error en archivos"); return 1; }
+
+    if (!csv || !data_bin) { 
+        perror("Error en archivos"); 
+        return 1; }
 
     printf("Indexando...\n");
 
     long *idx_name = malloc(HASH_SIZE * sizeof(long));
     long *idx_country_industry = malloc(HASH_SIZE * sizeof(long));
+
+    if (!idx_name || !idx_country_industry) {
+        perror("Error en malloc: ");
+        exit(-1);
+    }
+
     for(int i=0; i<HASH_SIZE; i++) idx_name[i] = idx_country_industry[i] = -1;
 
     char line[2048];
@@ -66,7 +77,11 @@ int main() {
 
         fseek(data_bin, 0, SEEK_END);
         long offset = ftell(data_bin);
-        if(fwrite(&c, sizeof(Company), 1, data_bin) != 1) { perror("Error fwrite"); break; }
+        r = fwrite(&c, sizeof(Company), 1, data_bin);
+        if (r != 1) { 
+            perror("Error fwrite"); 
+            exit(-1); 
+        }
 
         idx_name[h_name] = offset;
         idx_country_industry[h_country_industry] = offset;
@@ -76,11 +91,31 @@ int main() {
 
     FILE *f1 = fopen("bin/index_name.bin", "wb");
     FILE *f2 = fopen("bin/index_country_industry.bin", "wb");
-    fwrite(idx_name, sizeof(long), HASH_SIZE, f1);
-    fwrite(idx_country_industry, sizeof(long), HASH_SIZE, f2);
 
-    fclose(csv); fclose(data_bin); fclose(f1); fclose(f2);
-    free(idx_name); free(idx_country_industry);
+    if (!f1 || !f2) { 
+
+        perror("Error en archivos de índice"); 
+        exit(-1); 
+    }
+
+    r = fwrite(idx_name, sizeof(long), HASH_SIZE, f1);
+    if (r != HASH_SIZE) { 
+        perror("Error fwrite idx_name"); 
+        exit(-1); 
+    }
+
+    fwrite(idx_country_industry, sizeof(long), HASH_SIZE, f2);
+    if (r != HASH_SIZE) { 
+        perror("Error fwrite idx_country_industry"); 
+        exit(-1); 
+    }
+
+    fclose(csv); 
+    fclose(data_bin); 
+    fclose(f1); 
+    fclose(f2);
+    free(idx_name); 
+    free(idx_country_industry);
     printf("Indexación terminada: %d registros.\n", count);
     return 0;
 }

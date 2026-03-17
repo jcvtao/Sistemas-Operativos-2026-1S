@@ -45,14 +45,14 @@ int main() {
     
     if (!idx_name || !idx_country_industry) {
         perror("Error al asignar memoria para índices");
-        return 1;
+        exit(-1);
     }
 
     FILE *f_n = fopen("bin/index_name.bin", "rb");
     FILE *f_c = fopen("bin/index_country_industry.bin", "rb");
     if (!f_n || !f_c) {
         perror("Error: No se encontraron los archivos de índice. Ejecuta el indexer primero");
-        return 1;
+        exit(-1);
     }
 
     fread(idx_name, sizeof(long), HASH_SIZE, f_n);
@@ -63,7 +63,7 @@ int main() {
     FILE *data_f = fopen("bin/data.bin", "rb");
     if (!data_f) {
         perror("Error al abrir data.bin");
-        return 1;
+        exit(-1);
     }
 
     printf("[SEARCHER] Servicio activo y cargado en RAM (8MB). Esperando peticiones...\n");
