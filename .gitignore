@@ -9,7 +9,7 @@ p1-dataProgram
 
 # --- /Parcial-1 ---
 /Parcial-1/bin
-/Parcial-1/backup
+/Parcial-1/data/backup
 
 # --- Objetos y Librerías ---
 *.o
