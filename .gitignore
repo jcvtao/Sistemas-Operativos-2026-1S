@@ -1,8 +1,15 @@
 # --- Binarios y Ejecutables ---
 *.out
 *.exe
-/bin
+/Apuntes/bin
+
+# --- /Practica-1 ---
+/Practica-1/bin
 p1-dataProgram
+
+# --- /Parcial-1 ---
+/Parcial-1/bin
+/Parcial-1/backup
 
 # --- Objetos y Librerías ---
 *.o
@@ -18,7 +25,6 @@ p1-dataProgram
 *.idx
 
 # --- Documentación y Sistema ---
-# Archivos ocultos de sistema o editores
 .DS_Store
 .vscode/
 .idea/
