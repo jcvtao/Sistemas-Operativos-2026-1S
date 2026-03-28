@@ -21,9 +21,10 @@ int main(int argc, char *argv[]) {
 
     char *filename = argv[1];
     struct stat file_stat;
+    int s, r;
     
-    // Verificar estado inicial del archivo
-    if (stat(filename, &file_stat) == -1) {
+    s = stat(filename, &file_stat); // Estado inicial del archivo
+    if (s == -1) {
         perror("Error al acceder al archivo");
         exit(-1);
     }
@@ -35,24 +36,32 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         sleep(2);
-
-        if (stat(filename, &file_stat) == 0) {
-            // Comparar fecha de modificación
-            if (file_stat.st_mtime != last_mod_time) {
-                printf("El archivo tuvo un cambio. Realizando copia de seguridad...\n");
-                
-                // Creación de backup
-                char command[256];
-                snprintf(command, sizeof(command), "cp %s ./data/backup/%s.bak", filename, filename);
-                system(command);
-                
-                // Actualizar último tiempo de modificación
-                last_mod_time = file_stat.st_mtime;
-                printf("Archivo copiado con éxito en ./data/backup/%s.bak\n\n", filename);
-            }
-        } else {
+        s = stat(filename, &file_stat);
+        if (s != 0) {
             perror("Error al acceder al archivo"); // El archivo desapareció o cambió de nombre
             exit(-1);
+        }
+
+        // Comparar fecha de modificación
+        if (file_stat.st_mtime != last_mod_time) {
+            printf("El archivo tuvo un cambio. Realizando copia de seguridad...\n");
+            
+            // Creación de backup
+            char command[256];
+            snprintf(command, sizeof(command), "cp %s ./data/backup/%s.bak", filename, filename);
+
+            r = system(command); // Ejecución de comando
+            if (r == -1) {
+                perror("Error crítico al ejecutar comando utilizando system");
+                exit(-1);
+            } else if (r != 0) {
+                perror("Error al ejecutar comando cp (copy). Asegúrate de que el directorio './data/backup' exista");
+                exit(-1);
+            }
+            
+            // Actualizar último tiempo de modificación
+            last_mod_time = file_stat.st_mtime;
+            printf("Archivo copiado con éxito en ./data/backup/%s.bak\n\n", filename);
         }
     }
 
