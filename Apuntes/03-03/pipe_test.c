@@ -1,5 +1,3 @@
-%%writefile pipe_test.c
-
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
