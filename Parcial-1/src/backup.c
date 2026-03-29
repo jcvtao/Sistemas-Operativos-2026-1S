@@ -1,8 +1,11 @@
 /* Sistemas Operativos Parcial 1 (2026-1S)
+ * 
  * Integrantes:
  * - Yadixon David Alfonso Chiquillo - yalfonsoc@unal.edu.co
  * - Federico Puentes Acosta - fpuentesa@unal.edu.co
  * - Juan Camilo Vergara Tao - juvergarat@unal.edu.co 
+ * 
+ * Documentación: https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Parcial-1
  */
 
 #include <stdio.h>

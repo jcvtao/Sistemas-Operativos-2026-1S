@@ -17,10 +17,13 @@
 
 Este programa vigila un archivo específico, cuyo nombre se pasa desde la consola como argumento, y realiza una copia de seguridad automática en la carpeta `./data/backup/` cada vez que se detecta una modificación en su contenido.
 
-<!---
+
 ### Diagrama de Bloques
-TODO
---->
+
+El siguiente diagrama de bloques representa el flujo del programa.
+
+![Digrama](img/diagrama-bloques-parcial-1.png)
+
 
 ### Compilación
 
