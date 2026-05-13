@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/structures.h"
+#include "structures.h"
 
 /**
  * @brief Función Hash DJB2
@@ -69,18 +69,19 @@ int main() {
     }
 
     int count = 0;
+    char *f;
     while (fgets(line, sizeof(line), csv)) {
         char *ptr = line;
         Company c;
-        
-        get_field(&ptr);                                        // skip: #
-        strncpy(c.name, get_field(&ptr) ? : "", MAX_STR);       // name
-        strncpy(c.domain, get_field(&ptr) ? : "", MAX_STR);     // domain
-        strncpy(c.year, get_field(&ptr) ? : "", 10);            // year
-        strncpy(c.industry, get_field(&ptr) ? : "", MAX_STR);   // industry
-        get_field(&ptr);                                        // skip: size range
-        get_field(&ptr);                                        // skip: locality
-        strncpy(c.country, get_field(&ptr) ? : "", MAX_STR);    // country
+
+        get_field(&ptr);                                                    // skip: #
+        strncpy(c.name,     (f = get_field(&ptr)) ? f : "", MAX_STR);      // name
+        strncpy(c.domain,   (f = get_field(&ptr)) ? f : "", MAX_STR);      // domain
+        strncpy(c.year,     (f = get_field(&ptr)) ? f : "", 10);           // year
+        strncpy(c.industry, (f = get_field(&ptr)) ? f : "", MAX_STR);      // industry
+        get_field(&ptr);                                                    // skip: size range
+        get_field(&ptr);                                                    // skip: locality
+        strncpy(c.country,  (f = get_field(&ptr)) ? f : "", MAX_STR);      // country
         // skip: linkedin url, current employee estimate, total employee estimate
 
         // Hash Nombre

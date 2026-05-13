@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../include/structures.h"
+#include "structures.h"
 
 #define PORT 8080
 #define MAX_CLIENTS 32

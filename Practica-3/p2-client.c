@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../include/structures.h"
+#include "structures.h"
 
 #define SERVER_IP "127.0.0.1"
 #define PORT 8080
