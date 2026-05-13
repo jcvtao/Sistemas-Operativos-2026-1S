@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <termios.h>
 #include "structures.h"
 
 #define SERVER_IP "127.0.0.1"
@@ -26,6 +27,24 @@ int is_all_alpha(char *str) {
     for (int i = 0; str[i]; i++)
         if (!isalpha(str[i]) && str[i] != ' ' && str[i] != ',') return 0;
     return 1;
+}
+
+/**
+ * @brief Permite que se pueda continuar presionando cualquier tecla
+ */
+void continue_any_key() {
+    struct termios oldt, newt;
+    
+    printf("\nPress any key to continue...");
+    fflush(stdout);
+
+    tcgetattr(STDIN_FILENO, &oldt);             // Configuración actual de la terminal
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);           // Desactivamos el modo canónico          
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);    // Restauración de la terminal
 }
 
 int main() {
@@ -124,8 +143,7 @@ int main() {
 
         if (encontrados == 0) printf("No records found.\n");
 
-        printf("\nPress any key to continue...");
-        clean_stdin(); getchar();
+        continue_any_key();
     }
 
     close(sock_fd);
