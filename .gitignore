@@ -11,6 +11,9 @@ p1-dataProgram
 /Parcial-1/bin
 /Parcial-1/data/backup
 
+# --- /Practica-1 ---
+/Practica-3/bin
+
 # --- Objetos y Librerías ---
 *.o
 *.obj
