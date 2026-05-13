@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,7 +43,7 @@ unsigned long get_hash(unsigned char *str) {
  *        [Fecha YYYYMMDDTHHMMSS] Cliente [IP] [búsqueda - origen - destino]
  */
 void write_log(char *ip, int type, char *k1, char *k2) {
-    FILE *log = fopen("bin/server.log", "a");
+    FILE *log = fopen("search-history.log", "a");
     if (!log) { perror("Error abriendo log"); return; }
 
     time_t now = time(NULL);
