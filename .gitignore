@@ -26,6 +26,7 @@ p1-dataProgram
 *.bin
 *.dat
 *.idx
+*.log
 
 # --- Documentación y Sistema ---
 .DS_Store
