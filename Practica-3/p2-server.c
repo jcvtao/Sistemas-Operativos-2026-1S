@@ -20,12 +20,12 @@
 #define IDX_NAME    "bin/index-name.bin"
 #define IDX_CI      "bin/index-country-industry.bin"
 
-// Descriptores de los índices en disco (heredados por fork, sin malloc)
+// Descriptores de los índices en disco
 int fd_name, fd_ci;
 volatile sig_atomic_t n_clients = 0;
 
 /**
- * @brief Recoge procesos hijo terminados para evitar zombies
+ * @brief Recoge procesos hijo terminados
  */
 void handle_sigchld(int sig) {
     (void)sig;
@@ -43,8 +43,7 @@ unsigned long get_hash(unsigned char *str) {
 }
 
 /**
- * @brief Escribe una entrada en el log con el formato requerido:
- *        [Fecha YYYYMMDDTHHMMSS] Cliente [IP] [búsqueda - origen - destino]
+ * @brief Escribe una entrada en el log con el formato requerido
  */
 void write_log(char *ip, int type, char *k1, char *k2) {
     FILE *log = fopen(LOG_FILE, "a");
@@ -56,24 +55,15 @@ void write_log(char *ip, int type, char *k1, char *k2) {
     strftime(ts, sizeof(ts), "%Y%m%dT%H%M%S", t);
 
     if (type == 1)
-        fprintf(log, "[Fecha %s] Cliente [%s] [nombre - %s]\n", ts, ip, k1);
+        fprintf(log, "[%s] Cliente [%s] [nombre - %s]\n", ts, ip, k1);
     else
-        fprintf(log, "[Fecha %s] Cliente [%s] [pais_industria - %s - %s]\n", ts, ip, k1, k2);
+        fprintf(log, "[%s] Cliente [%s] [pais_industria - %s - %s]\n", ts, ip, k1, k2);
 
     fclose(log);
 }
 
 /**
  * @brief Proceso hijo: atiende todas las peticiones de un cliente.
- *
- *        Uso de memoria dinámica:
- *        - malloc()  : reserva el buffer inicial de resultados
- *        - realloc() : duplica la capacidad cuando se llena
- *        - free()    : libera el buffer al terminar cada búsqueda
- *
- *        Los índices permanecen en disco; pread() lee únicamente
- *        el offset del cubeto hash (8 bytes) sin mover el cursor
- *        del archivo, lo que es seguro con múltiples procesos hijo.
  */
 void attend_client(int client_fd, char *client_ip) {
     int r;
@@ -112,7 +102,7 @@ void attend_client(int client_fd, char *client_ip) {
                 if (strcasecmp(c.name, req.key1) == 0) {
                     if (encontrados >= capacidad) {
                         capacidad *= 2;
-                        Company *tmp = realloc(resultados, capacidad * sizeof(Company));
+                        Company *tmp = realloc(resultados, capacidad * sizeof(Company)); // Duplica la capacidad cuando se llena
                         if (!tmp) { perror("Error en realloc"); break; }
                         resultados = tmp;
                     }
@@ -142,7 +132,7 @@ void attend_client(int client_fd, char *client_ip) {
                 if (strcasecmp(c.country, req.key1) == 0 && strcasecmp(c.industry, req.key2) == 0) {
                     if (encontrados >= capacidad) {
                         capacidad *= 2;
-                        Company *tmp = realloc(resultados, capacidad * sizeof(Company));
+                        Company *tmp = realloc(resultados, capacidad * sizeof(Company)); // Duplica la capacidad cuando se llena
                         if (!tmp) { perror("Error en realloc"); break; }
                         resultados = tmp;
                     }
@@ -168,7 +158,7 @@ void attend_client(int client_fd, char *client_ip) {
 }
 
 int main() {
-    // Abrir índices en disco (sin cargar en RAM, sin malloc)
+    // Abrir índices en disco (sin cargar en RAM)
     fd_name = open(IDX_NAME, O_RDONLY);
     fd_ci   = open(IDX_CI,   O_RDONLY);
     if (fd_name < 0 || fd_ci < 0) {
@@ -176,7 +166,7 @@ int main() {
         exit(-1);
     }
 
-    // Registrar manejador SIGCHLD para evitar procesos zombie
+    // Registrar manejador SIGCHLD
     struct sigaction sa;
     sa.sa_handler = handle_sigchld;
     sigemptyset(&sa.sa_mask);

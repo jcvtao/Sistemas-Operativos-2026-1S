@@ -41,7 +41,7 @@ void continue_any_key() {
 
     tcgetattr(STDIN_FILENO, &oldt);             // Configuración actual de la terminal
     newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);           // Desactivamos el modo canónico          
+    newt.c_lflag &= ~(ICANON | ECHO);           // Desactivamos el modo canónico y el eco
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
     getchar();
