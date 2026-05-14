@@ -35,7 +35,7 @@ int main() {
     int r;
     char *s;
 
-    FILE *csv = fopen("data/companies_sorted.csv", "r");
+    FILE *csv = fopen("data/companies-sorted.csv", "r");
     FILE *data_bin = fopen("bin/data.bin", "wb+");
 
     if (!csv) { 
@@ -108,8 +108,8 @@ int main() {
         if (++count % 1000000 == 0) printf("Procesados %d...\n", count);
     }
 
-    FILE *f1 = fopen("bin/index_name.bin", "wb");
-    FILE *f2 = fopen("bin/index_country_industry.bin", "wb");
+    FILE *f1 = fopen("bin/index-name.bin", "wb");
+    FILE *f2 = fopen("bin/index-country-industry.bin", "wb");
 
     if (!f1 || !f2) { 
 

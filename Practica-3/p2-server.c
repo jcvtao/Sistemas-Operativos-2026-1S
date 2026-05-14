@@ -1,5 +1,3 @@
-#define _POSIX_C_SOURCE 200809L
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +12,13 @@
 #include <arpa/inet.h>
 #include "structures.h"
 
-#define PORT 8080
+#define PORT        8080
 #define MAX_CLIENTS 32
+#define INITIAL_CAP 8
+#define LOG_FILE    "search-history.log"
+#define DATA_BIN    "bin/data.bin"
+#define IDX_NAME    "bin/index-name.bin"
+#define IDX_CI      "bin/index-country-industry.bin"
 
 // Descriptores de los índices en disco (heredados por fork, sin malloc)
 int fd_name, fd_ci;
@@ -44,7 +47,7 @@ unsigned long get_hash(unsigned char *str) {
  *        [Fecha YYYYMMDDTHHMMSS] Cliente [IP] [búsqueda - origen - destino]
  */
 void write_log(char *ip, int type, char *k1, char *k2) {
-    FILE *log = fopen("search-history.log", "a");
+    FILE *log = fopen(LOG_FILE, "a");
     if (!log) { perror("Error abriendo log"); return; }
 
     time_t now = time(NULL);
@@ -53,7 +56,7 @@ void write_log(char *ip, int type, char *k1, char *k2) {
     strftime(ts, sizeof(ts), "%Y%m%dT%H%M%S", t);
 
     if (type == 1)
-        fprintf(log, "[Fecha %s] Cliente [%s] [nombre - %s - ]\n", ts, ip, k1);
+        fprintf(log, "[Fecha %s] Cliente [%s] [nombre - %s]\n", ts, ip, k1);
     else
         fprintf(log, "[Fecha %s] Cliente [%s] [pais_industria - %s - %s]\n", ts, ip, k1, k2);
 
@@ -75,7 +78,7 @@ void write_log(char *ip, int type, char *k1, char *k2) {
 void attend_client(int client_fd, char *client_ip) {
     int r;
 
-    FILE *data_f = fopen("bin/data.bin", "rb");
+    FILE *data_f = fopen(DATA_BIN, "rb");
     if (!data_f) {
         perror("Error abriendo data.bin");
         close(client_fd);
@@ -88,7 +91,7 @@ void attend_client(int client_fd, char *client_ip) {
 
         // Reservar buffer dinámico para acumular resultados
         int encontrados = 0;
-        int capacidad = 8;
+        int capacidad = INITIAL_CAP;
         Company *resultados = malloc(capacidad * sizeof(Company));
         if (!resultados) { perror("Error en malloc"); break; }
 
@@ -108,7 +111,6 @@ void attend_client(int client_fd, char *client_ip) {
                 if (r <= 0) { perror("Error leyendo empresa"); break; }
 
                 if (strcasecmp(c.name, req.key1) == 0) {
-                    // Ampliar buffer si se llenó
                     if (encontrados >= capacidad) {
                         capacidad *= 2;
                         Company *tmp = realloc(resultados, capacidad * sizeof(Company));
@@ -171,8 +173,8 @@ void attend_client(int client_fd, char *client_ip) {
 
 int main() {
     // Abrir índices en disco (sin cargar en RAM, sin malloc)
-    fd_name = open("bin/index_name.bin", O_RDONLY);
-    fd_ci   = open("bin/index_country_industry.bin", O_RDONLY);
+    fd_name = open(IDX_NAME, O_RDONLY);
+    fd_ci   = open(IDX_CI,   O_RDONLY);
     if (fd_name < 0 || fd_ci < 0) {
         perror("Error: ¡No se encontraron los archivos de índice! Ejecuta ./bin/indexer primero");
         exit(-1);

@@ -9,8 +9,9 @@
 #include <termios.h>
 #include "structures.h"
 
-#define SERVER_IP "127.0.0.1"
-#define PORT 8080
+#define SERVER_IP   "127.0.0.1"
+#define PORT        8080
+#define INITIAL_CAP 8
 
 /**
  * @brief Limpia el buffer de entrada
@@ -35,7 +36,7 @@ int is_all_alpha(char *str) {
 void continue_any_key() {
     struct termios oldt, newt;
     
-    printf("\nPress any key to continue...");
+    printf("\nPress any key to continue...\n\n");
     fflush(stdout);
 
     tcgetattr(STDIN_FILENO, &oldt);             // Configuración actual de la terminal
@@ -116,7 +117,7 @@ int main() {
 
         // Recibir y acumular resultados en buffer dinámico
         int encontrados = 0;
-        int capacidad = 8;
+        int capacidad = INITIAL_CAP;
         Company *resultados = malloc(capacidad * sizeof(Company));
         if (!resultados) { perror("Error en malloc"); break; }
 
@@ -141,7 +142,11 @@ int main() {
                     resultados[i].year, resultados[i].domain);
         free(resultados);
 
-        if (encontrados == 0) printf("No records found.\n");
+        if (encontrados == 0) {
+            printf("No records found.\n");
+        } else {
+            printf("\nThe search has ended!\n");
+        }
 
         continue_any_key();
     }
