@@ -1,4 +1,4 @@
-# Práctica 2: Cliente-Servidor con Sockets TCP
+# Práctica 3
 
 ## Integrantes
 
@@ -16,9 +16,26 @@ El enunciado de la práctica se encuentra en los siguientes enlaces:
 
 ## Dataset
 
-El dataset utilizado es el mismo de la práctica anterior: información de más de **7 millones de empresas** vinculadas a LinkedIn a nivel global. El archivo original en formato CSV (`companies_sorted.csv`) tiene un tamaño aproximado de **1.09 GB**.
+El dataset utilizado es el mismo de la [práctica anterior](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Practica-1#dataset): información de más de **7 millones de empresas** vinculadas a LinkedIn a nivel global. El archivo original en formato CSV (`companies-sorted.csv`) tiene un tamaño aproximado de **1.09 GB**.
 
 Enlace de descarga: [Kaggle: 7+ Million Company Dataset](https://www.kaggle.com/datasets/peopledatalabssf/free-7-million-company-dataset?resource=download)
+
+
+### Campos del Dataset
+
+| # | Campo | Tipo | Descripción |
+|---|-------|------|-------------|
+| 1 | # | int | Identificador de la empresa en el dataset. |
+| 2 | name | string | Nombre de la empresa. |
+| 3 | domain | string | Dominio web de la empresa. |
+| 4 | year founded | int | Año de creación. |
+| 5 | industry | string | Industria o sector económico al que pertenece la empresa. |
+| 6 | size range | string | Rango de empleados definido por la cantidad total de empleados. |
+| 7 | locality | string | Ubicación de la empresa incluyendo ciudad, estado y país. |
+| 8 | country | string | País donde se ubica la empresa. |
+| 9 | linkedIn url | string | URL de LinkedIn asociado con la empresa. |
+| 10 | current employee estimate | int | Número de empleados actuales de la empresa. |
+| 11 | total employee estimate | int | Número total de empleados de la empresa. |
 
 
 ## Implementación Técnica
@@ -27,13 +44,13 @@ Enlace de descarga: [Kaggle: 7+ Million Company Dataset](https://www.kaggle.com/
 
 El sistema se compone de dos programas independientes que se comunican a través de **sockets TCP/IP**:
 
-- **`p2-server`**: gestiona los archivos de índice y `data.bin`. Escucha conexiones entrantes en el puerto 8080 y puede atender hasta 32 clientes simultáneos. Por cada cliente que se conecta, crea un proceso hijo con `fork()` para atender sus peticiones sin bloquear al resto. Los procesos hijo terminados se recogen mediante el manejador de `SIGCHLD` con `waitpid()`, evitando procesos zombie. Adicionalmente, registra cada búsqueda en un archivo log con la IP del cliente y la fecha.
+- **`p2-server`**: gestiona los archivos de índice y `data.bin`. Escucha conexiones entrantes en el puerto 8080 y puede atender hasta 32 clientes simultáneos. Por cada cliente que se conecta, crea un proceso hijo con `fork()` para atender sus peticiones sin bloquear al resto; los procesos hijo terminados se recogen mediante el manejador de `SIGCHLD` con `waitpid()`. Adicionalmente, registra cada búsqueda en un archivo log (`search_history.log`) con la IP del cliente y la fecha.
 
 - **`p2-client`**: muestra el menú de búsqueda al usuario, se conecta al servidor al iniciar y mantiene la conexión abierta durante toda la sesión. Al salir con la opción `[3]`, cierra el socket.
 
 ### Criterios de Búsqueda
 
-Se mantienen los dos criterios de búsqueda de la práctica anterior:
+Se mantienen los dos criterios de búsqueda de la [práctica anterior](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Practica-1#criterios-de-b%C3%BAsqueda):
 
 1. **Búsqueda por nombre:** tabla hash de 500,000 entradas indexada sobre el campo `name`.
 
@@ -41,7 +58,7 @@ Se mantienen los dos criterios de búsqueda de la práctica anterior:
 
 ### Gestión de Memoria
 
-El enunciado exige que el proceso servidor no supere **1 MB de RAM**. Para cumplirlo, los archivos de índice (`index_name.bin` e `index_country_industry.bin`) **no se cargan en memoria**: el servidor los abre con `open()` y usa `pread()` para leer únicamente el offset del cubeto hash necesario (8 bytes por búsqueda). El resto de la cadena de colisiones se recorre sobre `data.bin` con `fseek()`, igual que en la práctica anterior.
+Para que el proceso servidor no supere **1 MB de RAM** los archivos de índice (`index_name.bin` e `index_country_industry.bin`) no se cargan en memoria, sino que el servidor los abre con `open()` y usa `pread()` para leer únicamente el offset de la tabla hash. El resto de la cadena de colisiones se recorre sobre `data.bin` con `fseek()`, igual que en la [práctica anterior](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Practica-1#criterios-de-b%C3%BAsqueda).
 
 Los resultados de cada búsqueda sí se acumulan en un buffer dinámico mediante `malloc()`, `realloc()` y `free()`:
 
@@ -51,25 +68,18 @@ Los resultados de cada búsqueda sí se acumulan en un buffer dinámico mediante
 
 El mismo patrón se aplica en el cliente para recibir y almacenar los resultados antes de mostrarlos.
 
-| Elemento | Práctica anterior | Esta práctica |
-|---|---|---|
-| Comunicación | FIFOs (local) | Sockets TCP/IP (red) |
-| Índices en RAM | `malloc` → 7.6 MB | `open` + `pread` → 0 MB |
-| Resultados | Enviados uno a uno | Buffer `malloc`/`realloc` |
-| Concurrencia | Un proceso fijo | `fork()` por cliente |
-
 ### Archivo Log
 
-El servidor registra cada petición en `search_history.log` con el siguiente formato:
+El servidor registra cada petición en `search-history.log` con el siguiente formato:
 
 ```
-[Fecha YYYYMMDDTHHMMSS] Cliente [IP] [tipo - clave1 - clave2]
+[Fecha YYYYMMDDTHHMMSS] Cliente [IP] [tipo_de_búsqueda - llave_1 - llave_2]
 ```
 
 Ejemplo:
 ```
-[Fecha 20260513T142301] Cliente [127.0.0.1] [nombre - google - ]
-[Fecha 20260513T142315] Cliente [127.0.0.1] [pais_industria - india - retail]
+[20260513T142301] Cliente [127.0.0.1] [nombre - google]
+[20260513T142315] Cliente [127.0.0.1] [pais_industria - india - retail]
 ```
 
 
@@ -77,7 +87,7 @@ Ejemplo:
 
 ### Requisitos
 1. Tener instalado `gcc` y `make`.
-2. Descargar el dataset [`companies_sorted.csv`](https://www.kaggle.com/datasets/peopledatalabssf/free-7-million-company-dataset?resource=download) y ubicarlo en `data/companies_sorted.csv`.
+2. Descargar el dataset [`companies-sorted.csv`](https://www.kaggle.com/datasets/peopledatalabssf/free-7-million-company-dataset?resource=download) y ubicarlo en `data/companies-sorted.csv`.
 
 ### Compilación
 En la raíz del proyecto, ejecutar:
@@ -86,22 +96,22 @@ make
 ```
 
 > [!TIP]
-> Para eliminar los ejecutables y volver a compilar desde cero:
+> Si desea eliminar correctamente los ejecutables y el log para volver a compilar puede ejecutar el comando
 > ```bash
-> make clean && make
+> make clean
 > ```
 
 ### Ejecución
 
 El servidor y el cliente son programas independientes que deben ejecutarse en **terminales separadas**.
 
-#### Paso 1 — Indexar el dataset (solo la primera vez)
+#### Paso 1 - Indexar el dataset (solo la primera vez)
 ```bash
 ./bin/indexer
 ```
-Genera `bin/data.bin`, `bin/index_name.bin` y `bin/index_country_industry.bin`. Con 7 millones de registros tarda varios minutos.
+Genera `bin/data.bin`, `bin/index-name.bin` y `bin/index-country-industry.bin`.
 
-#### Paso 2 — Iniciar el servidor
+#### Paso 2 - Iniciar el servidor
 ```bash
 ./bin/p2-server
 ```
@@ -111,7 +121,7 @@ El servidor queda en espera. No se cierra hasta recibir una señal de interrupci
 ```bash
 ./bin/p2-client
 ```
-Para conectarse a un servidor remoto, modificar la constante `SERVER_IP` en `p2-client.c` antes de compilar.
+Se abre el menú de búsqueda y se obtienen los resultados en la terminal. Para conectarse a un servidor remoto se debe modificar la constante `SERVER_IP` en `p2-client.c` antes de compilar.
 
 ### Rangos Válidos de Búsqueda
 
@@ -120,6 +130,10 @@ Para conectarse a un servidor remoto, modificar la constante `SERVER_IP` en `p2-
 
 ### Ejemplos de Uso
 
-- **Búsqueda por nombre:** seleccionar opción `[1]`, ingresar `google`. Retorna 4 resultados.
+- **Búsqueda por nombre:** Seleccionar opción `1`, ingresar `google`. El sistema retornará toda la información relacionada a Google presente en el dataset, que corresponde a 4 resultados.
 
-- **Búsqueda por país e industria:** seleccionar opción `[2]`, ingresar `india` como país y `retail` como industria. Retorna 1491 resultados.
+    ![Captura de búsqueda por nombre](img/busqueda_nombre.png)
+
+- **Búsqueda por país e industria:** Seleccionar opción `2`, escribir para el país `india` y para la industria `retail`. Retornará todas las empresas que coincidan con ambos filtros simultáneamente, obteniéndose la información de 1491 empresas.
+
+    ![Captura de búsqueda por país e industria](img/busqueda_pais_industria.png)
