@@ -16,4 +16,4 @@ indexer: indexer.c
 	$(CC) $(CFLAGS) -o bin/indexer indexer.c
 
 clean:
-	rm -rf bin
+	rm -rf bin search-history.log
