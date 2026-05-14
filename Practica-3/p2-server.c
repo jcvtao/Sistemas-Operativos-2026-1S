@@ -99,7 +99,6 @@ void attend_client(int client_fd, char *client_ip) {
         long offset;
 
         if (req.type == 1) { // BÚSQUEDA POR NOMBRE
-            printf("[LOG] Buscando por nombre: '%s'\n", req.key1);
             h = get_hash((unsigned char*)req.key1);
             pread(fd_name, &offset, sizeof(long), h * sizeof(long));
 
@@ -123,7 +122,6 @@ void attend_client(int client_fd, char *client_ip) {
             }
 
         } else if (req.type == 2) { // BÚSQUEDA POR PAÍS E INDUSTRIA
-            printf("[LOG] Buscando por Pais: '%s' e Industria: '%s'\n", req.key1, req.key2);
 
             // Llave combinada con memoria dinámica
             char *combined = malloc(MAX_STR * 2);
@@ -153,8 +151,6 @@ void attend_client(int client_fd, char *client_ip) {
                 offset = c.next_criteria;
             }
         }
-
-        printf("[LOG] Búsqueda finalizada. %d resultados enviados.\n", encontrados);
 
         // Enviar todos los resultados de una vez y liberar el buffer
         if (encontrados > 0)
@@ -203,8 +199,6 @@ int main() {
     if (bind(server_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) { perror("Error en bind"); exit(-1); }
     if (listen(server_fd, MAX_CLIENTS) < 0) { perror("Error en listen"); exit(-1); }
 
-    printf("[SERVIDOR] Servicio activo en puerto %d. Esperando clientes...\n", PORT);
-
     while (1) {
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
@@ -213,14 +207,12 @@ int main() {
 
         // Rechazar si se alcanzó el límite de clientes simultáneos
         if (n_clients >= MAX_CLIENTS) {
-            printf("[AVISO] Límite de %d clientes alcanzado. Rechazando conexión.\n", MAX_CLIENTS);
             close(client_fd);
             continue;
         }
 
         char client_ip[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
-        printf("[LOG] Nueva conexión de %s\n", client_ip);
 
         pid_t pid = fork();
         if (pid < 0) {
