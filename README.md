@@ -2,9 +2,16 @@
 
 ## Contenido
 
-- [Apuntes](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Apuntes): Códigos de clase
-- [Actividades](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Actividades): Talleres y tareas
-- [Práctica 1](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Practica-1): Procesos y comunicación entre procesos
+- [Apuntes](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Apuntes) (Códigos de clase)
+- [Actividades](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Actividades) (Talleres y tareas)
+
+## Prácticas
+
+- [Práctica 1](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Practica-1)
+- [Práctica 3](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Practica-3)
+
+# Parciales
+
 - [Parcial 1](https://github.com/jcvtao/Sistemas-Operativos-2026-1S/tree/main/Parcial-1)
 
 
